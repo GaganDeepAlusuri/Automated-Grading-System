@@ -1,4 +1,6 @@
+import os
 import streamlit as st
+from src.AutomatedGradingSystem.logging import logger  # Import the logger
 
 # Initialize Session State for Questions with one empty question if not already set
 if "questions" not in st.session_state or not st.session_state.questions:
@@ -17,6 +19,7 @@ def create_rubric_page():
         total_marks = int(total_marks_text)
     except ValueError:
         st.error("Please enter a valid integer for total marks.")
+        logger.error("Invalid input for total marks.")
         return
 
     # Calculate the total allocated marks
@@ -57,6 +60,7 @@ def create_rubric_page():
                 )  # Gray out the button when the limit is reached
             if st.button("➖", key=f"remove_{i}"):
                 remove_question(i)
+                logger.info(f"Removed question {i}")  # Log question removal
 
         # Update the question dictionary with the latest input
         st.session_state.questions[i] = {
@@ -64,7 +68,6 @@ def create_rubric_page():
             "rubric": rubric_text,
             "marks": marks,
         }
-
     # Custom Instructions at the bottom
     custom_instructions = st.text_area("Custom Instructions", key="custom_instructions")
 
@@ -74,6 +77,7 @@ def create_rubric_page():
             "questions": st.session_state.questions,
             "custom_instructions": custom_instructions,
         }
+        logger.info(f"Total allocated marks: {allocated_marks}")  # Log allocated marks
 
         # Display rubric data in a formatted way
         st.subheader("Rubric Data Summary:")
@@ -91,6 +95,9 @@ def create_rubric_page():
         )
         if uploaded_files:
             st.write("Submissions Uploaded:", uploaded_files)
+            logger.info(
+                f"Uploaded student submissions: {uploaded_files}"
+            )  # Log file upload
 
         # Return the rubric_dict dictionary
         return rubric_dict
@@ -101,6 +108,7 @@ def remove_question(index_to_remove):
     st.session_state.questions.pop(index_to_remove)
     # Rerun the app to refresh the state and UI
     st.experimental_rerun()
+    logger.info(f"Removed question {index_to_remove}")  # Log question removal
 
 
 def main():
@@ -117,6 +125,8 @@ def main():
 
     with tabs[2]:
         rubric_dict = create_rubric_page()
+        if rubric_dict:
+            logger.info("Rubric created successfully.")  # Log rubric creation
 
 
 if __name__ == "__main__":
