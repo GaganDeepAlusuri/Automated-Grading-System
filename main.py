@@ -67,13 +67,21 @@ def main():
                     st.success(
                         "Submission ZIP file uploaded and extracted successfully."
                     )
+                    logger.info(
+                        f"Submission ZIP file uploaded and extracted successfully."
+                    )
                 else:
                     st.error("Failed to upload or extract submissions.")
+                    logger.info(f"Failed to upload or extract submissions.")
 
                 if datasets_extracted:
                     st.success("Datasets ZIP file uploaded and extracted successfully.")
+                    logger.info(
+                        f"Datasets ZIP file uploaded and extracted successfully."
+                    )
                 else:
                     st.error("Failed to upload or extract datasets.")
+                    logger.info(f"Failed to upload or extract datasets.")
 
 
 if __name__ == "__main__":

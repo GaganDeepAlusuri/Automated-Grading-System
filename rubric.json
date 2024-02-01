@@ -1,17 +1,29 @@
 {
     "questions": [
         {
-            "question": "sad",
-            "criteria": "dss",
-            "deductions": "dds",
-            "marks": 60
+            "question": "Data Preprocessing",
+            "criteria": "Demonstrate appropriate data preprocessing steps, including handling missing values and encoding categorical features.",
+            "deductions": "Deduct 1 mark for each missing preprocessing step.Deduct 2 marks if any preprocessing step is incorrect or incomplete.",
+            "marks": 5
         },
         {
-            "question": "dsd",
-            "criteria": "sdds",
-            "deductions": "sdsd",
-            "marks": 40
+            "question": "Model Training",
+            "criteria": "Train a decision tree classifier on the preprocessed data.",
+            "deductions": "Deduct 1 mark if the model is not correctly trained.Deduct 2 marks if the model parameters are not optimized or if hyperparameters are chosen poorly.",
+            "marks": 5
+        },
+        {
+            "question": "Model Evaluation",
+            "criteria": "Evaluate the decision tree classifier using appropriate evaluation metrics (e.g., accuracy, precision, recall, F1-score).",
+            "deductions": "Deduct 1 mark for each missing or incorrect evaluation metric.Deduct 2 marks if the evaluation is not performed or is incomplete.",
+            "marks": 5
+        },
+        {
+            "question": "Interpretation",
+            "criteria": "Interpret the results of the decision tree model and explain the most important features for classification.",
+            "deductions": "Deduct 1 mark if the interpretation is incomplete or unclear. Deduct 2 marks if there is a major misunderstanding or misinterpretation of the model's results.",
+            "marks": 5
         }
     ],
-    "custom_instructions": "fds"
+    "custom_instructions": "You are tasked with implementing a decision tree classifier using Python's scikit-learn library. The objective of this assignment is to demonstrate your understanding of decision trees and your ability to apply them to a dataset. You will work with a small dataset and answer four questions related to data preprocessing, model training, evaluation, and interpretation.For this assignment, we will use a dataset containing information about different types of fruits. The dataset includes features such as \"weight, \"texture,\" and \"color\" and the target variable is the type of fruit (\"apple\" or \"orange\"). You can download the dataset as a CSV file named \"fruits.csv.\""
 }

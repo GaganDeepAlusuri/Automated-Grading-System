@@ -5,6 +5,9 @@ import zipfile
 import os
 
 
+import streamlit as st
+
+
 def create_rubric_page():
     st.header("Create New Rubric")
 
@@ -27,43 +30,41 @@ def create_rubric_page():
 
     for i, question in enumerate(st.session_state.questions):
         st.markdown("---")
-        cols = st.columns((1, 1, 1, 1, 0.1))
-        with cols[0]:
+        question_expander = st.expander(f"Question {i+1}")
+        with question_expander:
             question_text = st.text_area(
-                f"Question {i+1}", value=question["question"], key=f"question_{i}"
+                "Question", value=question["question"], key=f"question_{i}"
             )
-        with cols[1]:
             criteria_text = st.text_area(
-                f"Criteria {i+1}", value=question["criteria"], key=f"criteria_{i}"
+                "Criteria", value=question["criteria"], key=f"criteria_{i}"
             )
-        with cols[2]:
             deductions_text = st.text_area(
-                f"Deductions {i+1}", value=question["deductions"], key=f"deductions_{i}"
+                "Deductions", value=question["deductions"], key=f"deductions_{i}"
             )
-        with cols[3]:
             remaining_marks = total_marks - allocated_marks + question["marks"]
             marks = st.slider(
-                "", 0, int(remaining_marks), question["marks"], key=f"marks_{i}"
+                "Marks", 0, int(remaining_marks), question["marks"], key=f"marks_{i}"
             )
-            allocated_marks = sum(q["marks"] for q in st.session_state.questions)
-        with cols[4]:
-            if remaining_marks > 0:
-                if st.button("➕", key=f"add_{i}"):
-                    if allocated_marks >= total_marks:
-                        modal.open()
-                    else:
-                        st.session_state.questions.append(
-                            {
-                                "question": "",
-                                "criteria": "",
-                                "deductions": "",
-                                "marks": 0,
-                            }
-                        )
-            else:
-                st.button("➕", disabled=True)
-            if st.button("➖", key=f"remove_{i}"):
-                remove_question(i)
+
+        if remaining_marks > 0:
+            if st.button(f"➕ Add Question {i+2}"):  # Start with "Add Question 2"
+                if allocated_marks >= total_marks:
+                    modal.open()
+                else:
+                    st.session_state.questions.append(
+                        {
+                            "question": "",
+                            "criteria": "",
+                            "deductions": "",
+                            "marks": 0,
+                        }
+                    )
+        else:
+            st.button(
+                f"➕ Add Question {i+2}", disabled=True
+            )  # Start with "Add Question 2"
+        if st.button(f"➖ Remove Question {i+1}"):
+            remove_question(i)
 
         st.session_state.questions[i] = {
             "question": question_text,
