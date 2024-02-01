@@ -3,4 +3,5 @@ python-dotenv
 langchain
 openai
 streamlit-modal
+ipkernel
 -e .

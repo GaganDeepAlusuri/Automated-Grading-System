@@ -1,6 +1,8 @@
 import streamlit as st
-from src.AutomatedGradingSystem.logging import logger  # Import the logge
+from src.AutomatedGradingSystem.logging import logger  # Import the logger
 from src.AutomatedGradingSystem.components import modal
+import zipfile
+import os
 
 
 def create_rubric_page():
@@ -25,29 +27,38 @@ def create_rubric_page():
 
     for i, question in enumerate(st.session_state.questions):
         st.markdown("---")
-        cols = st.columns((2, 2, 1, 0.1))
+        cols = st.columns((1, 1, 1, 1, 0.1))
         with cols[0]:
             question_text = st.text_area(
-                f"Question {i+1}", value=question["text"], key=f"question_{i}"
+                f"Question {i+1}", value=question["question"], key=f"question_{i}"
             )
         with cols[1]:
-            rubric_text = st.text_area(
-                f"Rubric {i+1}", value=question["rubric"], key=f"rubric_{i}"
+            criteria_text = st.text_area(
+                f"Criteria {i+1}", value=question["criteria"], key=f"criteria_{i}"
             )
         with cols[2]:
+            deductions_text = st.text_area(
+                f"Deductions {i+1}", value=question["deductions"], key=f"deductions_{i}"
+            )
+        with cols[3]:
             remaining_marks = total_marks - allocated_marks + question["marks"]
             marks = st.slider(
                 "", 0, int(remaining_marks), question["marks"], key=f"marks_{i}"
             )
             allocated_marks = sum(q["marks"] for q in st.session_state.questions)
-        with cols[3]:
+        with cols[4]:
             if remaining_marks > 0:
                 if st.button("➕", key=f"add_{i}"):
                     if allocated_marks >= total_marks:
                         modal.open()
                     else:
                         st.session_state.questions.append(
-                            {"text": "", "rubric": "", "marks": 0}
+                            {
+                                "question": "",
+                                "criteria": "",
+                                "deductions": "",
+                                "marks": 0,
+                            }
                         )
             else:
                 st.button("➕", disabled=True)
@@ -55,8 +66,9 @@ def create_rubric_page():
                 remove_question(i)
 
         st.session_state.questions[i] = {
-            "text": question_text,
-            "rubric": rubric_text,
+            "question": question_text,
+            "criteria": criteria_text,
+            "deductions": deductions_text,
             "marks": marks,
         }
 
@@ -77,18 +89,11 @@ def create_rubric_page():
         st.subheader("Rubric Data Summary:")
         for i, question in enumerate(rubric_dict["questions"]):
             st.write(f"Question {i+1}:")
-            st.write(f"- Text: {question['text']}")
-            st.write(f"- Rubric: {question['rubric']}")
+            st.write(f"- question: {question['question']}")
+            st.write(f"- Criteria: {question['criteria']}")
+            st.write(f"- Deductions: {question['deductions']}")
             st.write(f"- Marks: {question['marks']}")
         st.write(f"Custom Instructions:\n{rubric_dict['custom_instructions']}\n")
-
-        st.subheader("Upload Student Submissions")
-        uploaded_files = st.file_uploader(
-            "Upload Student Submissions", type=["pdf", "zip"]
-        )
-        if uploaded_files:
-            st.write("Submissions Uploaded:", uploaded_files)
-            logger.info(f"Uploaded student submissions: {uploaded_files}")
         return rubric_dict
 
 
@@ -98,3 +103,30 @@ def remove_question(index_to_remove):
     # Rerun the app to refresh the state and UI
     st.experimental_rerun()
     logger.info(f"Removed question {index_to_remove}")  # Log question removal
+
+
+def ensure_directories_exist():
+    os.makedirs("submissions", exist_ok=True)
+    os.makedirs("datasets", exist_ok=True)
+
+
+def extract_and_save_submissions_and_datasets(uploaded_zip_file, uploaded_datasets):
+    ensure_directories_exist()
+    submissions_dir = "submissions"
+    datasets_dir = "datasets"
+
+    if uploaded_zip_file is not None:
+        with zipfile.ZipFile(uploaded_zip_file, "r") as zip_ref:
+            zip_ref.extractall(submissions_dir)
+        submissions_extracted = True
+    else:
+        submissions_extracted = False
+
+    if uploaded_datasets is not None:
+        with zipfile.ZipFile(uploaded_datasets, "r") as zip_ref:
+            zip_ref.extractall(datasets_dir)
+        datasets_extracted = True
+    else:
+        datasets_extracted = False
+
+    return submissions_extracted, datasets_extracted
